@@ -1,15 +1,15 @@
 const express = require('express');
 require('dotenv').config();
-require('./models/db');
+require('./models/db'); // Your DB connection file (make sure it connects mongoose)
 const userRouter = require('./routes/user');
 
-const User = require('./models/user');
-
 const app = express();
+
 app.use(express.json());
-app.use(userRouter);
+app.use('/api', userRouter);
 
+const PORT = process.env.PORT || 8000;
 
-app.listen(8000,() => {
-  console.log('port is listening');
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
