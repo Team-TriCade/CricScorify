@@ -1,28 +1,28 @@
-# 🏏 CricScorify
+# 🏏 CricScorify (React Native)
 
-**CricScorify** is your ultimate companion for real-time cricket updates, live scores, and match analytics. Whether you're a casual fan or a cricket enthusiast, CricScorify delivers fast, reliable, and beautifully designed cricket coverage straight to your fingertips.
+**CricScorify** is your ultimate companion for real-time cricket updates, live scores, and match analytics. Now rebuilt with **React Native**, enjoy seamless cross-platform performance on both Android and iOS devices.
 
 ---
 
 ## 📱 Features
 
 - ⚡ **Live Scores**  
-  Get ball-by-ball updates for ongoing matches with lightning-fast refresh speeds.
+  Real-time ball-by-ball updates with lightning-fast refresh.
 
 - 📊 **Match Details & Stats**  
-  Dive deep into player stats, scorecards, and match summaries for international and domestic games.
+  In-depth player stats, scorecards, and match summaries.
 
 - 🗓️ **Fixtures & Results**  
-  Browse upcoming match schedules and check results of recently concluded games.
+  View upcoming schedules and recent match results.
 
 - 🧠 **Smart Commentary**  
-  Follow AI-curated commentary and insights that make every ball more engaging.
+  AI-powered commentary for smarter cricket engagement.
 
 - 🌐 **Multi-format Coverage**  
-  Tracks Tests, ODIs, T20Is, and franchise leagues from around the world.
+  Tracks Tests, ODIs, T20Is, and franchise leagues globally.
 
 - 🔔 **Custom Notifications**  
-  Never miss a moment—set alerts for your favorite teams, matches, or key events.
+  Set alerts for teams, matches, and key events.
 
 ---
 
@@ -30,9 +30,10 @@
 
 ### Prerequisites
 
-- Android Studio (Giraffe or newer recommended)
-- Java 17 / Kotlin
-- Gradle 8.x
+- Node.js (v18+ recommended)
+- Expo CLI or React Native CLI
+- Android Studio / Xcode for emulators
+- Git
 
 ### Clone the repository
 
@@ -41,20 +42,34 @@ git clone https://github.com/Team-TriCade/CricScorify.git
 cd CricScorify
 ```
 
-### Build the project
+### Run the app
 
-1. Open in Android Studio
-2. Let Gradle sync
-3. Run the app on your device/emulator
+Using Expo:
+```bash
+npm install
+npx expo start
+```
 
-### Teck Stack
+Or with React Native CLI:
+```bash
+npm install
+npx react-native run-android # or run-ios
+```
 
-- Language: Kotlin
-- Architecture: MVVM
-- Networking: Retrofit, OkHttp
-- UI: Jetpack Compose / XML (based on implementation)
-- Database: Room / SQLite
-- Others: Firebase, Hilt, Coroutines
+---
 
-### Contributig
-We are not welcoming contributions as of now.
+## 🛠 Tech Stack
+
+- Framework: React Native
+- Navigation: React Navigation
+- State Management: Redux / Context API
+- Networking: Axios
+- Backend: Firebase / Custom API
+- Notifications: Expo Notifications / Firebase Cloud Messaging
+
+---
+
+## 🚫 Contributing
+
+We are not accepting contributions at this stage.
+
