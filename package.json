@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "client": "cd src && npx expo start",
-    "server": "npx nodemon server/server.js"
+    "server": "cd server && npx nodemon server.js"
   },
   "repository": {
     "type": "git",

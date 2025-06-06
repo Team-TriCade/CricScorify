@@ -1,88 +1,66 @@
-import React, { useState } from 'react';
-import {
-  View,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Image,
-} from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, TextInput, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-const BASE_URL = 'http://192.168.1.208:8000/api'; // replace with your backend IP & port
+import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
+import { AuthContext } from '../context/AuthContext';
+import config from '../config.json';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login } = useContext(AuthContext);
+
+  const showDialog = (type, title, text, button = 'OK') =>
+    Dialog.show({ type, title, textBody: text, button });
 
   const handleLogin = async () => {
+    if (loading) return;
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill all fields');
+      showDialog(ALERT_TYPE.DANGER, 'Missing Fields', 'Please enter both email and password');
       return;
     }
-    setLoading(true);
+
     try {
-      const response = await axios.post(`${BASE_URL}/sign-in`, { email, password });
-      if (response.data.success) {
-        Alert.alert('Success', `Welcome back!`);
-        // TODO: Save token or user info here if sent back
-        // e.g. AsyncStorage.setItem('token', response.data.token)
+      setLoading(true);
+      const res = await axios.post(`${config.BACKEND_URL}/sign-in`, { email, password });
+
+      if (res.data.success) {
+        login(res.data.token);
+        showDialog(ALERT_TYPE.SUCCESS, 'Login Successful', 'Welcome back!');
       } else {
-        Alert.alert('Login Failed', response.data.message || 'Invalid credentials');
+        showDialog(ALERT_TYPE.DANGER, 'Login Failed', res.data.message);
       }
-    } catch (error) {
-      console.log('Login error:', error.response?.data || error.message);
-      Alert.alert('Error', error.response?.data?.message || 'Something went wrong');
+    } catch (err) {
+      showDialog(ALERT_TYPE.DANGER, 'Error', err.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.container}
-    >
-      <Image
-        source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }}
-        style={styles.logo}
-      />
+    <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
 
-      <View style={styles.inputContainer}>
-        <Icon name="email" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          placeholder="Email"
-          placeholderTextColor="#aaa"
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoComplete="email"
-          textContentType="emailAddress"
-        />
-      </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        placeholderTextColor="#999"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
 
-      <View style={styles.inputContainer}>
-        <Icon name="lock" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor="#aaa"
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoComplete="password"
-          textContentType="password"
-        />
-      </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        placeholderTextColor="#999"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+        autoCapitalize="none"
+      />
 
       <TouchableOpacity
         style={[styles.button, loading && styles.buttonDisabled]}
@@ -93,34 +71,50 @@ export default function LoginScreen({ navigation }) {
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Login</Text>}
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-        <Text style={styles.link}>Don't have an account? Sign up</Text>
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
+      <Text style={styles.switchText} onPress={() => navigation.navigate('Signup')}>
+        Don't have an account? Sign up
+      </Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0d1117', justifyContent: 'center', paddingHorizontal: 30 },
-  logo: { width: 80, height: 80, alignSelf: 'center', marginBottom: 20 },
-  title: { color: '#fff', fontSize: 28, fontWeight: 'bold', alignSelf: 'center', marginBottom: 30 },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#161b22',
-    borderRadius: 8,
-    marginBottom: 20,
-    paddingHorizontal: 10,
+  container: {
+    flex: 1,
+    backgroundColor: '#111',
+    justifyContent: 'center',
+    padding: 24,
   },
-  icon: { marginRight: 8 },
-  input: { flex: 1, color: '#fff', height: 50 },
+  title: {
+    color: '#fff',
+    fontSize: 32,
+    marginBottom: 32,
+    textAlign: 'center',
+  },
+  input: {
+    backgroundColor: '#222',
+    color: '#fff',
+    padding: 14,
+    marginVertical: 10,
+    borderRadius: 8,
+  },
   button: {
-    backgroundColor: '#238636',
-    paddingVertical: 15,
+    backgroundColor: '#4CAF50',
+    padding: 14,
+    marginTop: 20,
     borderRadius: 8,
-    marginBottom: 20,
+    alignItems: 'center',
   },
-  buttonDisabled: { backgroundColor: '#555' },
-  buttonText: { color: '#fff', fontSize: 18, alignSelf: 'center' },
-  link: { color: '#58a6ff', textAlign: 'center', fontSize: 16 },
+  buttonDisabled: {
+    backgroundColor: '#3a7a34',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  switchText: {
+    marginTop: 20,
+    color: '#ccc',
+    textAlign: 'center',
+  },
 });

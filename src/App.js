@@ -1,18 +1,35 @@
-import React from 'react';
+// App.js
+import React, { useContext } from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import { AuthContext, AuthProvider } from './context/AuthContext';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LoginScreen from './screens/LoginScreen';
-import SignupScreen from './screens/SignupScreen';
+import { AlertNotificationRoot } from 'react-native-alert-notification';
+import AppNav from './navigation/AppNav';
 
-const Stack = createNativeStackNavigator();
+function RootApp() {
+  const { loading } = useContext(AuthContext);
+
+  if (loading) {
+    return (
+      <View style={{ flex:1, justifyContent:'center', alignItems:'center', backgroundColor:'#111' }}>
+        <ActivityIndicator size="large" color="#4CAF50" />
+      </View>
+    );
+  }
+
+  return (
+    <NavigationContainer>
+      <AlertNotificationRoot>
+        <AppNav />
+      </AlertNotificationRoot>
+    </NavigationContainer>
+  );
+}
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Signup" component={SignupScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+      <RootApp />
+    </AuthProvider>
   );
 }

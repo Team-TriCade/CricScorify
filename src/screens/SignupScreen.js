@@ -1,20 +1,9 @@
-import React, { useState } from 'react';
-import {
-  View,
-  TextInput,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Image,
-} from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, TextInput, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-const BASE_URL = 'http://192.168.1.208:8000/api'; // replace with your backend IP & port
+import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
+import { AuthContext } from '../context/AuthContext';
+import config from '../config.json';
 
 export default function SignupScreen({ navigation }) {
   const [fullname, setFullname] = useState('');
@@ -22,104 +11,83 @@ export default function SignupScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login } = useContext(AuthContext);
+
+  const showDialog = (type, title, text, button = 'OK') =>
+    Dialog.show({ type, title, textBody: text, button });
 
   const handleSignup = async () => {
+    if (loading) return;
+
     if (!fullname || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill all fields');
+      showDialog(ALERT_TYPE.DANGER, 'Missing Fields', 'All fields are required');
       return;
     }
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-    setLoading(true);
+
     try {
-      const response = await axios.post(`${BASE_URL}/create-user`, {
+      setLoading(true);
+      const res = await axios.post(`${config.BACKEND_URL}/create-user`, {
         fullname,
         email,
         password,
         confirmPassword,
       });
-      if (response.data.success) {
-        Alert.alert('Success', 'Account created!');
-        navigation.navigate('Login');
+
+      if (res.data.success) {
+        login(res.data.token);
+        showDialog(ALERT_TYPE.SUCCESS, 'Signup Successful', 'Welcome!');
       } else {
-        Alert.alert('Signup Failed', response.data.message || 'Try again');
+        showDialog(ALERT_TYPE.DANGER, 'Signup Failed', res.data.message);
       }
-    } catch (error) {
-      console.log('Signup error:', error.response?.data || error.message);
-      Alert.alert('Error', error.response?.data?.message || 'Something went wrong');
+    } catch (err) {
+      showDialog(ALERT_TYPE.DANGER, 'Error', err.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.container}
-    >
-      <Image
-        source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }}
-        style={styles.logo}
-      />
+    <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
 
-      <View style={styles.inputContainer}>
-        <Icon name="account" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          placeholder="Full Name"
-          placeholderTextColor="#aaa"
-          style={styles.input}
-          value={fullname}
-          onChangeText={setFullname}
-          autoCapitalize="words"
-          textContentType="name"
-        />
-      </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Full Name"
+        placeholderTextColor="#999"
+        value={fullname}
+        onChangeText={setFullname}
+        autoCapitalize="words"
+      />
 
-      <View style={styles.inputContainer}>
-        <Icon name="email" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          placeholder="Email"
-          placeholderTextColor="#aaa"
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoComplete="email"
-          textContentType="emailAddress"
-        />
-      </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        placeholderTextColor="#999"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
 
-      <View style={styles.inputContainer}>
-        <Icon name="lock" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor="#aaa"
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoComplete="password"
-          textContentType="password"
-        />
-      </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        placeholderTextColor="#999"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+        autoCapitalize="none"
+      />
 
-      <View style={styles.inputContainer}>
-        <Icon name="lock-check" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          placeholder="Confirm Password"
-          placeholderTextColor="#aaa"
-          style={styles.input}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-          autoComplete="password"
-          textContentType="password"
-        />
-      </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Confirm Password"
+        placeholderTextColor="#999"
+        secureTextEntry
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        autoCapitalize="none"
+      />
 
       <TouchableOpacity
         style={[styles.button, loading && styles.buttonDisabled]}
@@ -130,34 +98,50 @@ export default function SignupScreen({ navigation }) {
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign Up</Text>}
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.link}>Already have an account? Login</Text>
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
+      <Text style={styles.switchText} onPress={() => navigation.navigate('Login')}>
+        Already have an account? Login
+      </Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0d1117', justifyContent: 'center', paddingHorizontal: 30 },
-  logo: { width: 80, height: 80, alignSelf: 'center', marginBottom: 20 },
-  title: { color: '#fff', fontSize: 28, fontWeight: 'bold', alignSelf: 'center', marginBottom: 30 },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#161b22',
-    borderRadius: 8,
-    marginBottom: 20,
-    paddingHorizontal: 10,
+  container: {
+    flex: 1,
+    backgroundColor: '#111',
+    justifyContent: 'center',
+    padding: 24,
   },
-  icon: { marginRight: 8 },
-  input: { flex: 1, color: '#fff', height: 50 },
+  title: {
+    color: '#fff',
+    fontSize: 32,
+    marginBottom: 32,
+    textAlign: 'center',
+  },
+  input: {
+    backgroundColor: '#222',
+    color: '#fff',
+    padding: 14,
+    marginVertical: 10,
+    borderRadius: 8,
+  },
   button: {
-    backgroundColor: '#238636',
-    paddingVertical: 15,
+    backgroundColor: '#2196F3',
+    padding: 14,
+    marginTop: 20,
     borderRadius: 8,
-    marginBottom: 20,
+    alignItems: 'center',
   },
-  buttonDisabled: { backgroundColor: '#555' },
-  buttonText: { color: '#fff', fontSize: 18, alignSelf: 'center' },
-  link: { color: '#58a6ff', textAlign: 'center', fontSize: 16 },
+  buttonDisabled: {
+    backgroundColor: '#1769aa',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  switchText: {
+    marginTop: 20,
+    color: '#ccc',
+    textAlign: 'center',
+  },
 });
