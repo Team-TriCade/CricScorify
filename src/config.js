@@ -2,18 +2,18 @@ const config = {
   BACKEND_URL: 'http://192.168.1.208:8000/api',
   theme: {
     colors: {
-      background: '#121B2C',        // deep dark blue
-      primary: '#1E3A8A',           // strong navy blue
-      secondary: '#2D3E50',         // darker muted blue
-      danger: '#FF5C5C',
-      success: '#22C55E',
-      disabled: '#3B3B3B',
-      text1: '#FFFFFF',             // main white text
-      text2: '#D0D0D0',             // secondary light gray
-      text3: '#AAAAAA',             // muted gray
-      accent: '#3B82F6',            // brighter blue for buttons/accents
-      tabInactive: '#6B7280',       // dimmed text
-      tabBackground: '#0E1626',     // darker bottom bar blue
+      background: '#1E1E1E',        // dark gray
+      primary: '#2E2E2E',           // slightly lighter gray
+      secondary: '#3C3C3C',         // muted gray
+      danger: '#FF4C4C',            // bright red
+      success: '#28A745',           // green
+      disabled: '#5A5A5A',          // dimmed gray
+      text1: '#F5F5F5',             // main white text
+      text2: '#CCCCCC',             // secondary light gray
+      text3: '#999999',             // muted gray
+      accent: '#4A90E2',            // modern blue for buttons/accents
+      tabInactive: '#757575',       // dimmed text
+      tabBackground: '#2A2A2A',     // darker bottom bar gray
     },
     fontSizes: {
       title: 26,

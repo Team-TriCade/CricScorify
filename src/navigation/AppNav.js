@@ -8,6 +8,7 @@ import HomeScreen from '../screens/HomeScreen'; // ~ protected screen
 import ProfileScreen from '../screens/ProfileScreen'; // ~ protected screen
 import EditProfileScreen from '../screens/EditProfileScreen'; // ~ protected screen
 import SettingsScreen from '../screens/SettingsScreen'; // ~ protected screen
+import MatchSetupScreen from '../screens/MatchSetupScreen'; // ~ protected screen
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,7 @@ export default function AppNav() {
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="MatchSetup" component={MatchSetupScreen} />
         </>
       ) : (
         <>
