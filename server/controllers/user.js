@@ -82,3 +82,27 @@ exports.signOut = async (req, res) => {
     res.json({ success: true, message: 'Sign out successfully!' });
   }
 };
+
+exports.updateUserProfile = async (req, res) => {
+  try {
+    const updates = req.body;
+    // Optional: filter allowed fields only
+    const allowedUpdates = ['fullname', 'email', 'password'];
+    const actualUpdates = {};
+    allowedUpdates.forEach((field) => {
+      if (updates[field]) actualUpdates[field] = updates[field];
+    });
+
+    // If password update, hash it inside model or here before saving
+
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    Object.assign(user, actualUpdates);
+    await user.save();
+
+    res.json({ success: true, user: user.toObject({ versionKey: false }) });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

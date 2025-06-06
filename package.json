@@ -20,5 +20,10 @@
   "bugs": {
     "url": "https://github.com/Team-TriCade/CricScorify/issues"
   },
-  "homepage": "https://github.com/Team-TriCade/CricScorify#readme"
+  "homepage": "https://github.com/Team-TriCade/CricScorify#readme",
+  "dependencies": {
+    "@expo/metro-runtime": "^5.0.4",
+    "expo": "^53.0.10",
+    "react-native-vector-icons": "^10.2.0"
+  }
 }

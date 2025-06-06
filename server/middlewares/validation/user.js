@@ -46,3 +46,23 @@ exports.validateUserSignIn = [
     .isEmpty()
     .withMessage('email / password is required!'),
 ];
+
+exports.validateUserUpdate = [
+  check('fullname')
+    .optional()
+    .trim()
+    .isString()
+    .withMessage('Must be a valid name!')
+    .isLength({ min: 3, max: 20 })
+    .withMessage('Name must be within 3 to 20 characters!'),
+  check('email')
+    .optional()
+    .normalizeEmail()
+    .isEmail()
+    .withMessage('Invalid email!'),
+  check('password')
+    .optional()
+    .trim()
+    .isLength({ min: 8, max: 20 })
+    .withMessage('Password must be 8 to 20 characters long!'),
+];

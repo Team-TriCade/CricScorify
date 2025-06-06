@@ -1,4 +1,3 @@
-// components/UI.js
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -10,29 +9,57 @@ import {
   Animated,
   Easing,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import config from '../config';
 
-// Container for screens or sections
+const { colors, fontSizes, fonts, borderRadius } = config.theme;
+
+export function BottomTabBar({ tabs, selectedTab, onSelectTab }) {
+  return (
+    <View style={[styles.tabBarContainer, { backgroundColor: colors.tabBackground }]}>
+      {tabs.map((tab) => {
+        const focused = selectedTab === tab.key;
+        return (
+          <TouchableOpacity
+            key={tab.key}
+            style={styles.tabButton}
+            onPress={() => onSelectTab(tab.key)}
+            activeOpacity={0.7}
+          >
+            <Icon
+              name={tab.icon}
+              size={24}
+              color={focused ? colors.accent : colors.tabInactive}
+            />
+            <Text style={[styles.label, focused && styles.labelFocused]}>
+              {tab.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
 export const Container = ({ children, style }) => (
   <View style={[styles.container, style]}>{children}</View>
 );
 
-// Input with enhanced styles
 export const Input = (props) => (
   <TextInput
     style={styles.input}
-    placeholderTextColor="rgba(255, 255, 255, 0.6)"
+    placeholderTextColor={colors.text3}
     {...props}
   />
 );
 
-// Button variants
 export const Button = ({ children, style, variant = 'primary', ...rest }) => {
   const backgroundColors = {
-    primary: 'rgba(33, 150, 243, 0.9)',
-    secondary: 'rgba(100, 100, 100, 0.8)',
-    danger: 'rgba(255, 80, 80, 0.9)',
-    success: 'rgba(60, 180, 75, 0.9)',
-    disabled: 'rgba(120, 120, 120, 0.6)',
+    primary: colors.primary,
+    secondary: colors.secondary,
+    danger: colors.danger,
+    success: colors.success,
+    disabled: colors.disabled,
   };
 
   const bgColor = rest.disabled
@@ -54,7 +81,6 @@ export const ButtonText = ({ children, style }) => (
   <Text style={[styles.buttonText, style]}>{children}</Text>
 );
 
-// Text styles
 export const Title = ({ children, style }) => (
   <Text style={[styles.title, style]}>{children}</Text>
 );
@@ -73,7 +99,6 @@ export const LinkText = ({ children, onPress, style }) => (
   </Text>
 );
 
-// Modal component with header, body and footer slots
 export const CustomModal = ({
   visible,
   onClose,
@@ -98,7 +123,6 @@ export const CustomModal = ({
   </Modal>
 );
 
-// Simple Toast Notification component
 export const Toast = ({ message, visible, duration = 3000, onHide }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
 
@@ -134,7 +158,6 @@ export const Toast = ({ message, visible, duration = 3000, onHide }) => {
   );
 };
 
-// Form container for grouped inputs/buttons
 export const Form = ({ children, style }) => (
   <View style={[styles.formContainer, style]}>{children}</View>
 );
@@ -142,17 +165,37 @@ export const Form = ({ children, style }) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(18,18,18,0.95)',
+    backgroundColor: colors.background,
     justifyContent: 'center',
     padding: 24,
   },
+  tabBarContainer: {
+    flexDirection: 'row',
+    height: 60,
+    borderTopWidth: 1,
+    borderColor: '#444',
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  label: {
+    fontSize: fontSizes.label,
+    color: colors.tabInactive,
+    marginTop: 2,
+  },
+  labelFocused: {
+    color: colors.accent,
+    fontWeight: '600',
+  },
   input: {
     backgroundColor: 'rgba(255, 255, 255, 0.07)',
-    color: '#f0f0f0',
+    color: colors.text1,
     padding: 16,
     marginVertical: 12,
-    borderRadius: 16,
-    fontSize: 17,
+    borderRadius: borderRadius.input,
+    fontSize: fontSizes.body,
     fontWeight: '400',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
@@ -162,10 +205,10 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 16,
-    borderRadius: 20,
+    borderRadius: borderRadius.button,
     alignItems: 'center',
     marginTop: 24,
-    shadowColor: '#2196F3',
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
     shadowRadius: 12,
@@ -173,7 +216,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#e0e0e0',
-    fontSize: 18,
+    fontSize: fontSizes.button,
     fontWeight: '600',
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -182,34 +225,36 @@ const styles = StyleSheet.create({
     textShadowRadius: 2,
   },
   title: {
-    color: '#ffffff',
-    fontSize: 38,
+    color: colors.text1,
+    fontSize: fontSizes.title,
     fontWeight: '700',
     marginBottom: 40,
     textAlign: 'center',
-    fontFamily: 'System',
+    fontFamily: fonts.title,
     letterSpacing: 1.5,
-    textShadowColor: 'rgba(33, 150, 243, 0.85)',
+    textShadowColor: colors.primary,
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 10,
   },
   subtitle: {
-    color: '#ccc',
-    fontSize: 24,
+    color: colors.text2,
+    fontSize: fontSizes.subtitle,
     fontWeight: '600',
     marginBottom: 20,
     textAlign: 'center',
+    fontFamily: fonts.body,
   },
   bodyText: {
-    color: '#aaa',
-    fontSize: 16,
+    color: colors.text3,
+    fontSize: fontSizes.body,
     lineHeight: 22,
+    fontFamily: fonts.body,
   },
   linkText: {
     marginTop: 24,
-    color: 'rgba(255, 255, 255, 0.75)',
+    color: colors.text2,
     textAlign: 'center',
-    fontSize: 15,
+    fontSize: fontSizes.body,
     fontWeight: '500',
     textDecorationLine: 'underline',
   },
@@ -222,7 +267,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: '#222',
-    borderRadius: 16,
+    borderRadius: borderRadius.modal,
     padding: 24,
     width: '90%',
     maxWidth: 400,
@@ -233,9 +278,9 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   modalTitle: {
-    fontSize: 28,
+    fontSize: fontSizes.subtitle,
     fontWeight: '700',
-    color: '#fff',
+    color: colors.text1,
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -249,11 +294,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 40,
     alignSelf: 'center',
-    backgroundColor: 'rgba(33,150,243,0.9)',
+    backgroundColor: colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 30,
-    shadowColor: '#2196F3',
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
     shadowRadius: 10,
@@ -261,7 +306,7 @@ const styles = StyleSheet.create({
   },
   toastText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: fontSizes.toast,
     fontWeight: '600',
   },
   formContainer: {
