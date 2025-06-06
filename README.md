@@ -64,8 +64,8 @@ npx react-native run-android # or run-ios
 - Navigation: React Navigation
 - State Management: Redux / Context API
 - Networking: Axios
-- Backend: Firebase / Custom API
-- Notifications: Expo Notifications / Firebase Cloud Messaging
+- Backend: Mongoose / Custom API
+- Notifications: Expo Notifications / Firebase Cloud Messaging [TBD]
 
 ---
 
