@@ -53,7 +53,7 @@ export default function EditProfileScreen() {
         `${config.BACKEND_URL}/update-user`,
         { fullname: user.fullname, email: user.email, password: password || undefined },
         { headers: { Authorization: `Bearer ${userToken}` } }
-      );
+      );      
 
       if (res.data.success) {
         Dialog.show({ type: ALERT_TYPE.SUCCESS, title: 'Success', textBody: 'Profile updated successfully' });

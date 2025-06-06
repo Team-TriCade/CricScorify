@@ -5,7 +5,6 @@ const router = express.Router();
 const {
   createUser,
   userSignIn,
-  uploadProfile,
   signOut,
   updateUserProfile,
 } = require('../controllers/user');
@@ -24,6 +23,5 @@ router.get('/me', isAuth, async (req, res) => {
   const user = await User.findById(req.user._id).select('-password');
   res.json({ success: true, user });
 });
-router.put('/update-profile', isAuth, validateUserUpdate, updateUserProfile);
-
+router.put('/update-user', isAuth, validateUserUpdate, userVlidation, updateUserProfile);
 module.exports = router;
