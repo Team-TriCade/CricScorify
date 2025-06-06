@@ -1,3 +1,4 @@
+// screens/LoginScreen.js
 import React, { useState, useContext } from 'react';
 import { ActivityIndicator } from 'react-native';
 import axios from 'axios';
@@ -17,6 +18,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     if (loading) return;
+
     if (!email || !password) {
       showDialog(ALERT_TYPE.DANGER, 'Missing Fields', 'Please enter both email and password');
       return;
@@ -59,7 +61,7 @@ export default function LoginScreen({ navigation }) {
         onChangeText={setPassword}
       />
 
-      <Button onPress={handleLogin} disabled={loading} activeOpacity={0.8} style={loading ? { backgroundColor: '#3a7a34' } : {}}>
+      <Button onPress={handleLogin} disabled={loading} style={loading ? { backgroundColor: '#3a7a34' } : {}}>
         {loading ? <ActivityIndicator color="#fff" /> : <ButtonText>Login</ButtonText>}
       </Button>
 

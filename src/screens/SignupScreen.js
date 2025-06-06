@@ -1,3 +1,4 @@
+// screens/SignupScreen.js
 import React, { useState, useContext } from 'react';
 import { ActivityIndicator } from 'react-native';
 import axios from 'axios';
@@ -86,7 +87,7 @@ export default function SignupScreen({ navigation }) {
         onChangeText={setConfirmPassword}
       />
 
-      <Button onPress={handleSignup} disabled={loading} activeOpacity={0.8} style={loading ? { backgroundColor: '#1769aa' } : {}}>
+      <Button onPress={handleSignup} disabled={loading} style={loading ? { backgroundColor: '#1769aa' } : {}}>
         {loading ? <ActivityIndicator color="#fff" /> : <ButtonText>Sign Up</ButtonText>}
       </Button>
 
