@@ -36,11 +36,15 @@ export default function SignupScreen({ navigation }) {
         fullname,
         email,
         password,
+        confirmPassword,
       });
 
       if (res.data.success) {
-        login(res.data.token);
-        showDialog(ALERT_TYPE.SUCCESS, 'Signup Successful', 'Welcome!');
+        await login(res.data.token);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
       } else {
         showDialog(ALERT_TYPE.DANGER, 'Signup Failed', res.data.message);
       }

@@ -5,7 +5,10 @@ import { AuthContext } from '../context/AuthContext';
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import HomeScreen from '../screens/HomeScreen'; // ~ protected screen
-import ProfileScreen from '../screens/ProfileScreen'; 
+import ProfileScreen from '../screens/ProfileScreen'; // ~ protected screen
+import EditProfileScreen from '../screens/EditProfileScreen'; // ~ protected screen
+import SettingsScreen from '../screens/SettingsScreen'; // ~ protected screen
+import MatchSetupScreen from '../screens/MatchSetupScreen'; // ~ protected screen
 
 const Stack = createNativeStackNavigator();
 
@@ -15,14 +18,20 @@ export default function AppNav() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {userToken ? (
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="MatchSetup" component={MatchSetupScreen} />
+        </>
       ) : (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
         </>
       )}
     </Stack.Navigator>
+
   );
 }
