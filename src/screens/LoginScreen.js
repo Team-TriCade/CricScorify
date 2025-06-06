@@ -1,4 +1,3 @@
-// screens/LoginScreen.js
 import React, { useState, useContext } from 'react';
 import { ActivityIndicator } from 'react-native';
 import axios from 'axios';
@@ -61,7 +60,11 @@ export default function LoginScreen({ navigation }) {
         onChangeText={setPassword}
       />
 
-      <Button onPress={handleLogin} disabled={loading} style={loading ? { backgroundColor: '#3a7a34' } : {}}>
+      <Button
+        onPress={handleLogin}
+        disabled={loading}
+        style={loading ? { backgroundColor: '#3a7a34' } : {}}
+      >
         {loading ? <ActivityIndicator color="#fff" /> : <ButtonText>Login</ButtonText>}
       </Button>
 

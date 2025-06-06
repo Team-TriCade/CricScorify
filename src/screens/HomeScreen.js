@@ -35,7 +35,6 @@ export default function HomeScreen() {
       <Button onPress={logout} style={{ backgroundColor: '#ff4d4d' }}>
         <ButtonText>Logout</ButtonText>
       </Button>
-
     </Container>
   );
 }
