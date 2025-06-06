@@ -23,19 +23,11 @@ export default function DashboardScreen() {
   }, [userToken]);
 
   return (
-    <Container style={{ flex: 1, paddingBottom: 80 }}>
-      <Title style={{ marginBottom: 20 }}>
-        {user ? `Welcome, ${user.fullname} 🎯` : 'Loading...'}
+    <Container style={{ flex: 1, paddingTop: 10, paddingBottom: 80, justifyContent: 'flex-start' }}>
+      <Title style={{ textAlign: 'center', alignSelf: 'center', marginBottom: 20 }}>
+        {user ? `Welcome, ${user.fullname}` : 'Loading...'}
       </Title>
-      <Subtitle style={{ textAlign: 'center', marginBottom: 40, color: config.theme.colors.text2 }}>
-        Your personalized dashboard is ready.
-      </Subtitle>
-      <Button
-        onPress={logout}
-        style={{ backgroundColor: config.theme.colors.danger, alignSelf: 'center', width: '50%' }}
-      >
-        <ButtonText>Logout</ButtonText>
-      </Button>
+      
     </Container>
   );
 }
