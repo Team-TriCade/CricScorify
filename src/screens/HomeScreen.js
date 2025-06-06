@@ -1,29 +1,38 @@
-import React, { useContext } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import React, { useEffect, useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import config from '../config';
+import { Container, Title, Button } from '../components/UI';
 
 export default function HomeScreen() {
-  const { logout } = useContext(AuthContext);
+  const { logout, userToken } = useContext(AuthContext);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch(`${config.BACKEND_URL}/me`, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        });
+        const data = await res.json();
+        if (data.success) {
+          setUser(data.user);
+        } else {
+          console.log('Fetch failed:', data.message);
+        }
+      } catch (err) {
+        console.log('Failed to fetch user:', err);
+      }
+    };
+
+    if (userToken) fetchUser();
+  }, [userToken]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to CricScorify 🎯</Text>
-      <Button title="Logout" onPress={logout} color="#ff4d4d" />
-    </View>
+    <Container>
+      <Title>{user ? `Welcome, ${user.fullname} 🎯` : 'Loading...'}</Title>
+      <Button title="Logout" onPress={logout} style={{ backgroundColor: '#ff4d4d' }} />
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#111',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 24,
-    marginBottom: 20,
-  },
-});

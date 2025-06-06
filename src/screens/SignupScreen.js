@@ -1,9 +1,10 @@
 import React, { useState, useContext } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { AuthContext } from '../context/AuthContext';
-import config from '../config.json';
+import config from '../config';
+import { Container, Input, Button, ButtonText, LinkText, Title } from '../components/UI';
 
 export default function SignupScreen({ navigation }) {
   const [fullname, setFullname] = useState('');
@@ -24,13 +25,17 @@ export default function SignupScreen({ navigation }) {
       return;
     }
 
+    if (password !== confirmPassword) {
+      showDialog(ALERT_TYPE.DANGER, 'Password Mismatch', 'Passwords do not match');
+      return;
+    }
+
     try {
       setLoading(true);
       const res = await axios.post(`${config.BACKEND_URL}/create-user`, {
         fullname,
         email,
         password,
-        confirmPassword,
       });
 
       if (res.data.success) {
@@ -47,101 +52,47 @@ export default function SignupScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+    <Container>
+      <Title>Sign Up</Title>
 
-      <TextInput
-        style={styles.input}
+      <Input
         placeholder="Full Name"
-        placeholderTextColor="#999"
+        autoCapitalize="words"
         value={fullname}
         onChangeText={setFullname}
-        autoCapitalize="words"
       />
 
-      <TextInput
-        style={styles.input}
+      <Input
         placeholder="Email"
-        placeholderTextColor="#999"
-        value={email}
-        onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        value={email}
+        onChangeText={setEmail}
       />
 
-      <TextInput
-        style={styles.input}
+      <Input
         placeholder="Password"
-        placeholderTextColor="#999"
         secureTextEntry
+        autoCapitalize="none"
         value={password}
         onChangeText={setPassword}
-        autoCapitalize="none"
       />
 
-      <TextInput
-        style={styles.input}
+      <Input
         placeholder="Confirm Password"
-        placeholderTextColor="#999"
         secureTextEntry
+        autoCapitalize="none"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
-        autoCapitalize="none"
       />
 
-      <TouchableOpacity
-        style={[styles.button, loading && styles.buttonDisabled]}
-        onPress={handleSignup}
-        disabled={loading}
-        activeOpacity={0.8}
-      >
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign Up</Text>}
-      </TouchableOpacity>
+      <Button onPress={handleSignup} disabled={loading} activeOpacity={0.8} style={loading ? { backgroundColor: '#1769aa' } : {}}>
+        {loading ? <ActivityIndicator color="#fff" /> : <ButtonText>Sign Up</ButtonText>}
+      </Button>
 
-      <Text style={styles.switchText} onPress={() => navigation.navigate('Login')}>
+      <LinkText onPress={() => navigation.navigate('Login')}>
         Already have an account? Login
-      </Text>
-    </View>
+      </LinkText>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#111',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 32,
-    marginBottom: 32,
-    textAlign: 'center',
-  },
-  input: {
-    backgroundColor: '#222',
-    color: '#fff',
-    padding: 14,
-    marginVertical: 10,
-    borderRadius: 8,
-  },
-  button: {
-    backgroundColor: '#2196F3',
-    padding: 14,
-    marginTop: 20,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  buttonDisabled: {
-    backgroundColor: '#1769aa',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  switchText: {
-    marginTop: 20,
-    color: '#ccc',
-    textAlign: 'center',
-  },
-});

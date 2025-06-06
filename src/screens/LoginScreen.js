@@ -1,9 +1,10 @@
 import React, { useState, useContext } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { AuthContext } from '../context/AuthContext';
-import config from '../config.json';
+import config from '../config';
+import { Container, Input, Button, ButtonText, LinkText, Title } from '../components/UI';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -39,82 +40,32 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+    <Container>
+      <Title>Login</Title>
 
-      <TextInput
-        style={styles.input}
+      <Input
         placeholder="Email"
-        placeholderTextColor="#999"
-        value={email}
-        onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        value={email}
+        onChangeText={setEmail}
       />
 
-      <TextInput
-        style={styles.input}
+      <Input
         placeholder="Password"
-        placeholderTextColor="#999"
         secureTextEntry
+        autoCapitalize="none"
         value={password}
         onChangeText={setPassword}
-        autoCapitalize="none"
       />
 
-      <TouchableOpacity
-        style={[styles.button, loading && styles.buttonDisabled]}
-        onPress={handleLogin}
-        disabled={loading}
-        activeOpacity={0.8}
-      >
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Login</Text>}
-      </TouchableOpacity>
+      <Button onPress={handleLogin} disabled={loading} activeOpacity={0.8} style={loading ? { backgroundColor: '#3a7a34' } : {}}>
+        {loading ? <ActivityIndicator color="#fff" /> : <ButtonText>Login</ButtonText>}
+      </Button>
 
-      <Text style={styles.switchText} onPress={() => navigation.navigate('Signup')}>
+      <LinkText onPress={() => navigation.navigate('Signup')}>
         Don't have an account? Sign up
-      </Text>
-    </View>
+      </LinkText>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#111',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 32,
-    marginBottom: 32,
-    textAlign: 'center',
-  },
-  input: {
-    backgroundColor: '#222',
-    color: '#fff',
-    padding: 14,
-    marginVertical: 10,
-    borderRadius: 8,
-  },
-  button: {
-    backgroundColor: '#4CAF50',
-    padding: 14,
-    marginTop: 20,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  buttonDisabled: {
-    backgroundColor: '#3a7a34',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  switchText: {
-    marginTop: 20,
-    color: '#ccc',
-    textAlign: 'center',
-  },
-});
