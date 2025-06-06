@@ -1,8 +1,16 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import config from '../config';
-import { Container, Title, Button, ButtonText, BottomTabBar } from '../components/UI';
+import {
+  Container,
+  Title,
+  Button,
+  ButtonText,
+  BottomTabBar,
+  Subtitle,
+  BodyText,
+} from '../components/UI';
 
 export default function HomeScreen() {
   const { logout, userToken } = useContext(AuthContext);
@@ -30,22 +38,30 @@ export default function HomeScreen() {
   ];
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: config.theme.colors.background }}>
       <Container style={{ flex: 1, paddingBottom: 80 }}>
         {tab === 'home' && (
           <>
-            <Title>{user ? `Welcome, ${user.fullname} 🎯` : 'Loading...'}</Title>
-            <Button onPress={logout} style={{ backgroundColor: '#ff4d4d' }}>
+            <Title style={{ marginBottom: 20 }}>
+              {user ? `Welcome, ${user.fullname} 🎯` : 'Loading...'}
+            </Title>
+            <Subtitle style={{ textAlign: 'center', marginBottom: 40, color: config.theme.colors.text2 }}>
+              Your personalized dashboard is ready.
+            </Subtitle>
+            <Button
+              onPress={logout}
+              style={{ backgroundColor: config.theme.colors.danger, alignSelf: 'center', width: '50%' }}
+            >
               <ButtonText>Logout</ButtonText>
             </Button>
           </>
         )}
         {tab === 'profile' && user && (
-          <>
-            <Title>Profile</Title>
-            <ButtonText>Full Name: {user.fullname}</ButtonText>
-            <ButtonText>Email: {user.email}</ButtonText>
-          </>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Title style={{ marginBottom: 24 }}>Profile</Title>
+            <BodyText style={{ marginBottom: 12 }}>Full Name: {user.fullname}</BodyText>
+            <BodyText>Email: {user.email}</BodyText>
+          </ScrollView>
         )}
       </Container>
       <BottomTabBar tabs={tabs} selectedTab={tab} onSelectTab={setTab} />

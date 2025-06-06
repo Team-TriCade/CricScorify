@@ -2,35 +2,35 @@ const config = {
   BACKEND_URL: 'http://192.168.1.208:8000/api',
   theme: {
     colors: {
-      background: 'rgba(18,18,18,0.95)',
-      primary: 'rgba(33, 150, 243, 0.9)',
-      secondary: 'rgba(100, 100, 100, 0.8)',
-      danger: 'rgba(255, 80, 80, 0.9)',
-      success: 'rgba(60, 180, 75, 0.9)',
-      disabled: 'rgba(120, 120, 120, 0.6)',
-      text1: '#ffffff',
-      text2: '#ccc',
-      text3: '#aaa',
-      accent: '#4caf50',
-      tabInactive: '#999',
-      tabBackground: 'rgba(30,30,30,0.95)',
+      background: '#121B2C',        // deep dark blue
+      primary: '#1E3A8A',           // strong navy blue
+      secondary: '#2D3E50',         // darker muted blue
+      danger: '#FF5C5C',
+      success: '#22C55E',
+      disabled: '#3B3B3B',
+      text1: '#FFFFFF',             // main white text
+      text2: '#D0D0D0',             // secondary light gray
+      text3: '#AAAAAA',             // muted gray
+      accent: '#3B82F6',            // brighter blue for buttons/accents
+      tabInactive: '#6B7280',       // dimmed text
+      tabBackground: '#0E1626',     // darker bottom bar blue
     },
     fontSizes: {
-      title: 38,
-      subtitle: 24,
-      body: 16,
-      label: 12,
-      button: 18,
-      toast: 16,
+      title: 26,
+      subtitle: 20,
+      body: 15,
+      label: 14,
+      button: 14,
+      toast: 14,
     },
     fonts: {
       title: 'System',
       body: 'System',
     },
     borderRadius: {
-      input: 16,
-      button: 20,
-      modal: 16,
+      input: 10,
+      button: 16,
+      modal: 14,
     },
   },
 };
