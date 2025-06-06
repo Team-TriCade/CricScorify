@@ -1,0 +1,24 @@
+{
+  "name": "cricscorify",
+  "version": "1.0.0",
+  "description": "Cricket scoring app",
+  "main": "index.js",
+  "scripts": {
+    "client": "cd src && npx expo start",
+    "server": "npx nodemon server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Team-TriCade/CricScorify.git"
+  },
+  "keywords": [
+    "cricket",
+    "scoring"
+  ],
+  "author": "Team-TriCade",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Team-TriCade/CricScorify/issues"
+  },
+  "homepage": "https://github.com/Team-TriCade/CricScorify#readme"
+}
