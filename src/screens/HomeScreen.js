@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import config from '../config';
-import { Container, Title, Button } from '../components/UI';
+import { Container, Title, Button, ButtonText } from '../components/UI';
 
 export default function HomeScreen() {
   const { logout, userToken } = useContext(AuthContext);
@@ -32,7 +32,10 @@ export default function HomeScreen() {
   return (
     <Container>
       <Title>{user ? `Welcome, ${user.fullname} 🎯` : 'Loading...'}</Title>
-      <Button title="Logout" onPress={logout} style={{ backgroundColor: '#ff4d4d' }} />
+      <Button onPress={logout} style={{ backgroundColor: '#ff4d4d' }}>
+        <ButtonText>Logout</ButtonText>
+      </Button>
+
     </Container>
   );
 }
