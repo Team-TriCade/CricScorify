@@ -6,7 +6,7 @@ import DashboardScreen from './DashboardScreen';
 import ProfileScreen from './ProfileScreen';
 import SettingsScreen from './SettingsScreen';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation}) {
   const [tab, setTab] = useState('home');
 
   const tabs = [
@@ -17,7 +17,7 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: config.theme.colors.background }}>
-      {tab === 'home' && <DashboardScreen />}
+      {tab === 'home' && <DashboardScreen navigation={navigation} />}
       {tab === 'profile' && <ProfileScreen />}
       {tab === 'settings' && <SettingsScreen />}
       <BottomTabBar tabs={tabs} selectedTab={tab} onSelectTab={setTab} />

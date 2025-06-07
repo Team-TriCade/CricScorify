@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+
     const loadToken = async () => {
       try {
         const token = await AsyncStorage.getItem('userToken');

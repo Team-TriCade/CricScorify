@@ -1,68 +1,263 @@
-import React, { useState } from 'react';
-import { ScrollView } from 'react-native';
-import { Container, Input, Button, ButtonText, Title, Subtitle } from '../components/UI';
-import { Picker } from '@react-native-picker/picker';
+import React, { useContext, useRef, useEffect, useState } from 'react';
+import {
+  View, Text, TextInput, TouchableOpacity, ScrollView,
+  StyleSheet, KeyboardAvoidingView, Platform,
+  TouchableWithoutFeedback, Keyboard, StatusBar
+} from 'react-native';
+import { MatchContext } from '../context/MatchContext';
 
 export default function MatchSetupScreen({ navigation }) {
-  const [matchName, setMatchName] = useState('');
-  const [matchType, setMatchType] = useState('limited');
-  const [overs, setOvers] = useState('');
-  const [playersPerSide, setPlayersPerSide] = useState('11');
-  const [lastManBatting, setLastManBatting] = useState(true);
-  const [teamA, setTeamA] = useState('');
-  const [teamB, setTeamB] = useState('');
+  const {
+    matchType, setMatchType,
+    overs, setOvers,
+    savedOvers, setSavedOvers,
+    teamA, setTeamA,
+    teamB, setTeamB,
+    tossWinner, setTossWinner,
+    tossDecision, setTossDecision
+  } = useContext(MatchContext);
+
+  const inputRef = useRef(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (matchType === 'Test') {
+      setSavedOvers(overs);
+      setOvers('');
+    } else if (matchType === 'Limited Overs' && overs === '') {
+      setOvers(savedOvers || '');
+    }
+  }, [matchType]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', () => {
+      setTeamA(null);
+      setTeamB(null);
+    });
+    return unsubscribe;
+  }, [navigation, setTeamA, setTeamB]);
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+    inputRef.current?.blur();
+  };
+
+  const handleTypeSwitch = (type) => {
+    setMatchType(type);
+  };
+
+  const chooseTeam = (teamKey) => {
+    dismissKeyboard();
+    navigation.navigate('TeamSelectScreen', { teamKey });
+  };
 
   const handleNext = () => {
-    navigation.navigate('TeamSetup', {
-      matchDetails: {
-        matchName,
-        matchType,
-        overs: matchType === 'limited' ? overs : 'Unlimited',
-        playersPerSide,
-        lastManBatting,
-        teamA,
-        teamB,
-      },
-    });
+    if (!teamA || !teamB) {
+      setError('Please select both teams');
+      return;
+    }
+    if (matchType === 'Limited Overs' && !overs) {
+      setError('Please enter number of overs');
+      return;
+    }
+    if (!tossWinner || !tossDecision) {
+      setError('Please complete toss selection');
+      return;
+    }
+    setError('');
+    navigation.navigate('NextScreen'); // replace with actual screen
   };
 
   return (
-    <ScrollView>
-      <Container style={{ paddingBottom: 80 }}>
-        <Title>Match Setup</Title>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={{ flex: 1, backgroundColor: '#121212' }}>
+        <StatusBar barStyle="light-content" backgroundColor="#121212" />
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={80}
+        >
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.container}
+          >
+            <Text style={styles.heading}>Match Setup</Text>
 
-        <Input placeholder="Match Name" value={matchName} onChangeText={setMatchName} />
+            <Text style={styles.label}>Select Match Type</Text>
+            <View style={styles.typeContainer}>
+              <TouchableOpacity
+                style={[styles.typeButton, matchType === 'Limited Overs' && styles.typeSelected]}
+                onPress={() => handleTypeSwitch('Limited Overs')}
+              >
+                <Text style={styles.typeText}>Limited Overs</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.typeButton, matchType === 'Test' && styles.typeSelected]}
+                onPress={() => handleTypeSwitch('Test')}
+              >
+                <Text style={styles.typeText}>Test</Text>
+              </TouchableOpacity>
+            </View>
 
-        <Subtitle>Match Type</Subtitle>
-        <Picker selectedValue={matchType} onValueChange={setMatchType}>
-          <Picker.Item label="Limited Overs" value="limited" />
-          <Picker.Item label="Test Match" value="test" />
-        </Picker>
+            {matchType === 'Limited Overs' && (
+              <>
+                <Text style={styles.label}>Enter Overs</Text>
+                <TextInput
+                  ref={inputRef}
+                  style={styles.input}
+                  value={overs}
+                  onChangeText={setOvers}
+                  placeholder="e.g. 20"
+                  placeholderTextColor="#999"
+                  keyboardType="numeric"
+                  returnKeyType="done"
+                  onSubmitEditing={dismissKeyboard}
+                  blurOnSubmit
+                />
+              </>
+            )}
 
-        {matchType === 'limited' && (
-          <Input placeholder="Number of Overs" keyboardType="numeric" value={overs} onChangeText={setOvers} />
-        )}
+            <Text style={styles.label}>Select Team A</Text>
+            <TouchableOpacity
+              style={styles.selector}
+              onPress={() => chooseTeam('teamA')}
+            >
+              <Text style={styles.selectorText}>
+                {teamA ? teamA.name : 'Choose Team A'}
+              </Text>
+            </TouchableOpacity>
 
-        <Subtitle>Players Per Side</Subtitle>
-        <Picker selectedValue={playersPerSide} onValueChange={setPlayersPerSide}>
-          <Picker.Item label="6" value="6" />
-          <Picker.Item label="8" value="8" />
-          <Picker.Item label="11" value="11" />
-        </Picker>
+            <Text style={styles.label}>Select Team B</Text>
+            <TouchableOpacity
+              style={styles.selector}
+              onPress={() => chooseTeam('teamB')}
+            >
+              <Text style={styles.selectorText}>
+                {teamB ? teamB.name : 'Choose Team B'}
+              </Text>
+            </TouchableOpacity>
 
-        <Subtitle>Allow Last Man Batting</Subtitle>
-        <Picker selectedValue={lastManBatting} onValueChange={val => setLastManBatting(val)}>
-          <Picker.Item label="Yes" value={true} />
-          <Picker.Item label="No" value={false} />
-        </Picker>
+            <Text style={styles.label}>Toss Winner</Text>
+            <View style={styles.typeContainer}>
+              <TouchableOpacity
+                style={[styles.typeButton, tossWinner === 'A' && styles.typeSelected]}
+                onPress={() => setTossWinner('A')}
+              >
+                <Text style={styles.typeText}>{teamA?.name || 'Team A'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.typeButton, tossWinner === 'B' && styles.typeSelected]}
+                onPress={() => setTossWinner('B')}
+              >
+                <Text style={styles.typeText}>{teamB?.name || 'Team B'}</Text>
+              </TouchableOpacity>
+            </View>
 
-        <Input placeholder="Team A Name" value={teamA} onChangeText={setTeamA} />
-        <Input placeholder="Team B Name" value={teamB} onChangeText={setTeamB} />
+            <Text style={styles.label}>Toss Decision</Text>
+            <View style={styles.typeContainer}>
+              <TouchableOpacity
+                style={[styles.typeButton, tossDecision === 'bat' && styles.typeSelected]}
+                onPress={() => setTossDecision('bat')}
+              >
+                <Text style={styles.typeText}>Bat</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.typeButton, tossDecision === 'bowl' && styles.typeSelected]}
+                onPress={() => setTossDecision('bowl')}
+              >
+                <Text style={styles.typeText}>Bowl</Text>
+              </TouchableOpacity>
+            </View>
 
-        <Button onPress={handleNext}>
-          <ButtonText>Next: Add Players</ButtonText>
-        </Button>
-      </Container>
-    </ScrollView>
+            {error !== '' && (
+              <Text style={styles.error}>{error}</Text>
+            )}
+
+            <TouchableOpacity
+              style={styles.nextButton}
+              onPress={handleNext}
+            >
+              <Text style={styles.nextText}>Next</Text>
+            </TouchableOpacity>
+
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#121212',
+  },
+  heading: {
+    color: '#fff',
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  label: {
+    color: '#ccc',
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  typeContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 20,
+  },
+  typeButton: {
+    flex: 1,
+    backgroundColor: '#1e1e1e',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  typeSelected: {
+    backgroundColor: '#00c853',
+  },
+  typeText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  input: {
+    backgroundColor: '#222',
+    color: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  selector: {
+    backgroundColor: '#222',
+    padding: 14,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  selectorText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  nextButton: {
+    backgroundColor: '#00c853',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  nextText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  error: {
+    color: 'red',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+});

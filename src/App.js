@@ -5,6 +5,7 @@ import { AuthContext, AuthProvider } from './context/AuthContext';
 import { NavigationContainer } from '@react-navigation/native';
 import { AlertNotificationRoot } from 'react-native-alert-notification';
 import AppNav from './navigation/AppNav';
+import { MatchProvider } from './context/MatchContext';
 
 function RootApp() {
   const { loading } = useContext(AuthContext);
@@ -29,7 +30,9 @@ function RootApp() {
 export default function App() {
   return (
     <AuthProvider>
-      <RootApp />
+      <MatchProvider>
+        <RootApp />
+      </MatchProvider>
     </AuthProvider>
   );
 }

@@ -8,7 +8,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const userRouter = require('./routes/user');
 
 // Import routes
 const userRouter = require('./routes/user');

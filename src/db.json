@@ -1,0 +1,66 @@
+{
+  "teams": [
+    {
+      "id": "1",
+      "name": "Souls XI",
+      "logo": "https://example.com/soulsxi.png",
+      "ownerGmail": "test@gmail.com",
+      "players": [
+        { "id": "p1", "name": "Souls", "role": "Captain", "battingStyle": "Right-hand bat", "bowlingStyle": "Right-arm offbreak" },
+        { "id": "p2", "name": "Alpha", "role": "Batsman", "battingStyle": "Left-hand bat", "bowlingStyle": "None" }
+      ],
+      "matchesPlayed": 10,
+      "wins": 7,
+      "losses": 3,
+      "createdAt": "2024-01-01T12:00:00Z",
+      "isPublic": false
+    },
+    {
+      "id": "2",
+      "name": "Bravo Blasters",
+      "logo": "https://example.com/bravo.png",
+      "ownerGmail": "bravo@example.com",
+      "players": [
+        { "id": "p3", "name": "Bravo", "role": "Captain", "battingStyle": "Right-hand bat", "bowlingStyle": "Right-arm fast" },
+        { "id": "p4", "name": "Chad", "role": "All-rounder", "battingStyle": "Right-hand bat", "bowlingStyle": "Left-arm spin" }
+      ],
+      "matchesPlayed": 8,
+      "wins": 4,
+      "losses": 4,
+      "createdAt": "2024-02-15T15:00:00Z",
+      "isPublic": true
+    },
+    {
+      "id": "3",
+      "name": "Global Titans",
+      "logo": "https://example.com/titans.png",
+      "ownerGmail": "admin_global@example.com",
+      "players": [
+        { "id": "p5", "name": "TitanX", "role": "Batsman", "battingStyle": "Left-hand bat", "bowlingStyle": "None" },
+        { "id": "p6", "name": "SpinLord", "role": "Bowler", "battingStyle": "Right-hand bat", "bowlingStyle": "Right-arm legbreak" }
+      ],
+      "matchesPlayed": 5,
+      "wins": 3,
+      "losses": 2,
+      "createdAt": "2024-04-10T18:30:00Z",
+      "isPublic": true
+    }
+  ],
+  "users": [
+    {
+      "id": "user_123",
+      "name": "Souly",
+      "email": "souly@example.com"
+    },
+    {
+      "id": "user_999",
+      "name": "BravoUser",
+      "email": "bravo@example.com"
+    },
+    {
+      "id": "admin_global",
+      "name": "Global Admin",
+      "email": "admin_global@example.com"
+    }
+  ]
+}

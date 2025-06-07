@@ -1,10 +1,19 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import {
+  ActivityIndicator,
+  View,
+  StyleSheet,
+  Keyboard,
+  TouchableWithoutFeedback
+} from 'react-native';
+
 import axios from 'axios';
 import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { AuthContext } from '../context/AuthContext';
 import config from '../config';
-import { Container, Input, Button, ButtonText, Title } from '../components/UI';
+import {
+  Container, Input, Button, ButtonText, Title
+} from '../components/UI';
 
 export default function EditProfileScreen() {
   const { userToken } = useContext(AuthContext);
@@ -13,6 +22,19 @@ export default function EditProfileScreen() {
   const [user, setUser] = useState({ fullname: '', email: '' });
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const fullNameRef = useRef();
+  const emailRef = useRef();
+  const passRef = useRef();
+  const confirmRef = useRef();
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+    fullNameRef.current?.blur();
+    emailRef.current?.blur();
+    passRef.current?.blur();
+    confirmRef.current?.blur();
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -53,7 +75,7 @@ export default function EditProfileScreen() {
         `${config.BACKEND_URL}/update-user`,
         { fullname: user.fullname, email: user.email, password: password || undefined },
         { headers: { Authorization: `Bearer ${userToken}` } }
-      );      
+      );
 
       if (res.data.success) {
         Dialog.show({ type: ALERT_TYPE.SUCCESS, title: 'Success', textBody: 'Profile updated successfully' });
@@ -69,51 +91,76 @@ export default function EditProfileScreen() {
     }
   };
 
-  if (loading) return (
-    <Container>
-      <Title>Loading Profile...</Title>
-      <ActivityIndicator size="large" color="#2196F3" />
-    </Container>
-  );
+  if (loading) {
+    return (
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View style={styles.wrapper}>
+          <Container>
+            <Title>Loading Profile...</Title>
+            <ActivityIndicator size="large" color="#2196F3" />
+          </Container>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  }
+
 
   return (
-    <Container>
-      <Title>Edit Profile</Title>
+    <View style={styles.wrapper}>
+  <TouchableWithoutFeedback onPress={dismissKeyboard}>
+    <View style={{ flex: 1 }}>
+      <Container>
+        <Title>Edit Profile</Title>
 
-      <Input
-        placeholder="Full Name"
-        autoCapitalize="words"
-        value={user.fullname}
-        onChangeText={text => setUser(prev => ({ ...prev, fullname: text }))}
-      />
+        <Input
+          ref={fullNameRef}
+          placeholder="Full Name"
+          autoCapitalize="words"
+          value={user.fullname}
+          onChangeText={text => setUser(prev => ({ ...prev, fullname: text }))}
+        />
 
-      <Input
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={user.email}
-        onChangeText={text => setUser(prev => ({ ...prev, email: text }))}
-      />
+        <Input
+          ref={emailRef}
+          placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={user.email}
+          onChangeText={text => setUser(prev => ({ ...prev, email: text }))}
+        />
 
-      <Input
-        placeholder="New Password (leave blank to keep current)"
-        secureTextEntry
-        autoCapitalize="none"
-        value={password}
-        onChangeText={setPassword}
-      />
+        <Input
+          ref={passRef}
+          placeholder="New Password (leave blank to keep current)"
+          secureTextEntry
+          autoCapitalize="none"
+          value={password}
+          onChangeText={setPassword}
+        />
 
-      <Input
-        placeholder="Confirm New Password"
-        secureTextEntry
-        autoCapitalize="none"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
+        <Input
+          ref={confirmRef}
+          placeholder="Confirm New Password"
+          secureTextEntry
+          autoCapitalize="none"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+        />
 
-      <Button onPress={handleSave} disabled={saving} style={saving ? { backgroundColor: '#1769aa' } : {}}>
-        {saving ? <ActivityIndicator color="#fff" /> : <ButtonText>Save Changes</ButtonText>}
-      </Button>
-    </Container>
+        <Button onPress={handleSave} disabled={saving} style={saving ? { backgroundColor: '#1769aa' } : {}}>
+          {saving ? <ActivityIndicator color="#fff" /> : <ButtonText>Save Changes</ButtonText>}
+        </Button>
+      </Container>
+    </View>
+  </TouchableWithoutFeedback>
+</View>
+
   );
 }
+
+const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    backgroundColor: config.theme.colors.background,
+  },
+});
