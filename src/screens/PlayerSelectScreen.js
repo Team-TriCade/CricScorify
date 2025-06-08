@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, FlatList, TouchableOpacity,
+  View, Text, FlatList, TouchableOpacity,TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform,
   TextInput, StyleSheet, StatusBar
 } from 'react-native';
 import db from '../db.json';
