@@ -38,7 +38,7 @@ exports.userSignIn = async (req, res) => {
     });
 
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: '1d',
+    expiresIn: '60d',
   });
 
   let oldTokens = user.tokens || [];

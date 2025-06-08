@@ -4,34 +4,63 @@ import {
   FlatList, StyleSheet, StatusBar, Image
 } from 'react-native';
 import { MatchContext } from '../context/MatchContext';
-
-import teamsData from '../db.json';
+import { AuthContext } from '../context/AuthContext';
+import config from '../config';
 
 export default function TeamSelectScreen({ route, navigation }) {
   const { teamKey } = route.params;
   const { setTeamA, setTeamB } = useContext(MatchContext);
+  const { userToken } = useContext(AuthContext);
 
-  const userGmail = 'user@example.com';  // your logged in user's email here
-  const allTeams = teamsData.teams;
-
-  const yourTeams = allTeams.filter(team => team.ownerGmail === userGmail);
-  const globalTeams = allTeams.filter(team => team.ownerGmail !== userGmail);
-
+  const [userEmail, setUserEmail] = useState('');
+  const [allTeams, setAllTeams] = useState([]);
+  const [filteredTeams, setFilteredTeams] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showGlobal, setShowGlobal] = useState(false);
-  const [filteredTeams, setFilteredTeams] = useState([]);
 
   useEffect(() => {
-    const target = showGlobal ? globalTeams : yourTeams;
-    const filtered = target.filter(team =>
-      team.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const fetchUser = async () => {
+      try {
+        const res = await fetch(`${config.BACKEND_URL}/me`, {
+          headers: { Authorization: `Bearer ${userToken}` },
+        });
+        const data = await res.json();
+        if (data.success) setUserEmail(data.user.email);
+      } catch (err) {
+        console.log('Fetch user email error:', err);
+      }
+    };
+
+    const fetchTeams = async () => {
+      try {
+        const res = await fetch(`${config.BACKEND_URL}/teams/getTeams`);
+        const data = await res.json();
+        setAllTeams(data);
+      } catch (err) {
+        console.log('Fetch teams error:', err);
+      }
+    };
+
+    fetchUser();
+    fetchTeams();
+  }, [userToken]);
+
+  useEffect(() => {
+    if (!userEmail) return;
+
+    const filtered = allTeams
+      .filter(team =>
+        showGlobal ? team.ownerEmail !== userEmail : team.ownerEmail === userEmail
+      )
+      .filter(team =>
+        team.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     setFilteredTeams(filtered);
-  }, [searchQuery, showGlobal]);
+  }, [allTeams, searchQuery, showGlobal, userEmail]);
 
   const selectTeam = (team) => {
     if (teamKey === 'teamA') setTeamA(team);
-    else if (teamKey === 'teamB') setTeamB(team);
+    else setTeamB(team);
     navigation.goBack();
   };
 
@@ -65,7 +94,7 @@ export default function TeamSelectScreen({ route, navigation }) {
 
       <FlatList
         data={filteredTeams}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.teamButton}
@@ -82,62 +111,27 @@ export default function TeamSelectScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-    padding: 20,
-  },
-  heading: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
+  container: { flex: 1, backgroundColor: '#121212', padding: 20 },
+  heading: { color: '#fff', fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
   search: {
-    backgroundColor: '#1E1E1E',
-    padding: 12,
-    borderRadius: 10,
-    color: '#fff',
-    marginBottom: 15,
+    backgroundColor: '#1E1E1E', padding: 12, borderRadius: 10,
+    color: '#fff', marginBottom: 15
   },
-  switchContainer: {
-    flexDirection: 'row',
-    marginBottom: 20,
-  },
+  switchContainer: { flexDirection: 'row', marginBottom: 20 },
   switchButton: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: '#1E1E1E',
-    borderRadius: 6,
-    marginHorizontal: 5,
-    alignItems: 'center',
+    flex: 1, padding: 10, backgroundColor: '#1E1E1E',
+    borderRadius: 6, marginHorizontal: 5, alignItems: 'center'
   },
-  activeTab: {
-    backgroundColor: '#00c853',
-  },
-  switchText: {
-    color: '#fff',
-    fontSize: 16,
-  },
+  activeTab: { backgroundColor: '#00c853' },
+  switchText: { color: '#fff', fontSize: 16 },
   teamButton: {
-    backgroundColor: '#1E1E1E',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-    borderRadius: 10,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#333',
+    backgroundColor: '#1E1E1E', flexDirection: 'row',
+    alignItems: 'center', padding: 14, borderRadius: 10,
+    marginBottom: 15, borderWidth: 1, borderColor: '#333',
   },
   logo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 15,
-    backgroundColor: '#333',
+    width: 40, height: 40, borderRadius: 20,
+    marginRight: 15, backgroundColor: '#333',
   },
-  teamName: {
-    color: '#fff',
-    fontSize: 18,
-  },
+  teamName: { color: '#fff', fontSize: 18 },
 });
