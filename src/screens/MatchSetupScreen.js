@@ -65,7 +65,10 @@ export default function MatchSetupScreen({ navigation }) {
       return;
     }
     setError('');
-    navigation.navigate('NextScreen'); // replace with actual screen
+    navigation.navigate('PlayerSelectScreen', {
+      teamA,
+      teamB,
+    });
   };
 
   return (
@@ -74,13 +77,15 @@ export default function MatchSetupScreen({ navigation }) {
         <StatusBar barStyle="light-content" backgroundColor="#121212" />
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={80}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
+
           <ScrollView
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={styles.container}
+            showsVerticalScrollIndicator={false}
           >
+
             <Text style={styles.heading}>Match Setup</Text>
 
             <Text style={styles.label}>Select Match Type</Text>
@@ -187,33 +192,38 @@ export default function MatchSetupScreen({ navigation }) {
   );
 }
 
+import { Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
+const isSmall = width < 360;
+
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 20,
+    padding: width * 0.05,
     backgroundColor: '#121212',
   },
   heading: {
     color: '#fff',
-    fontSize: 28,
+    fontSize: width * 0.07,
     fontWeight: 'bold',
-    marginBottom: 30,
+    marginBottom: height * 0.03,
     textAlign: 'center',
   },
   label: {
     color: '#ccc',
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: width * 0.045,
+    marginBottom: 8,
   },
   typeContainer: {
     flexDirection: 'row',
     gap: 10,
-    marginBottom: 20,
+    marginBottom: height * 0.02,
   },
   typeButton: {
     flex: 1,
     backgroundColor: '#1e1e1e',
-    padding: 12,
+    paddingVertical: height * 0.015,
     borderRadius: 8,
     alignItems: 'center',
   },
@@ -222,42 +232,44 @@ const styles = StyleSheet.create({
   },
   typeText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: width * 0.04,
   },
   input: {
     backgroundColor: '#222',
     color: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: width * 0.04,
+    paddingVertical: height * 0.015,
     borderRadius: 8,
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: width * 0.045,
+    marginBottom: height * 0.025,
   },
   selector: {
     backgroundColor: '#222',
-    padding: 14,
+    paddingVertical: height * 0.018,
+    paddingHorizontal: width * 0.04,
     borderRadius: 8,
-    marginBottom: 20,
+    marginBottom: height * 0.025,
   },
   selectorText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: width * 0.045,
   },
   nextButton: {
     backgroundColor: '#00c853',
-    padding: 14,
+    paddingVertical: height * 0.02,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: height * 0.025,
   },
   nextText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: width * 0.05,
     fontWeight: 'bold',
   },
   error: {
     color: 'red',
-    marginBottom: 10,
+    marginBottom: height * 0.015,
     textAlign: 'center',
+    fontSize: width * 0.04,
   },
 });
