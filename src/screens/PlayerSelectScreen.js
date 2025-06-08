@@ -1,123 +1,121 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
-  View, Text, FlatList, TouchableOpacity,TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform,
-  TextInput, StyleSheet, StatusBar
+  View, Text, FlatList, TouchableOpacity, TextInput,
+  StyleSheet, ActivityIndicator,
 } from 'react-native';
-import db from '../db.json';
+import { AuthContext } from '../context/AuthContext';
+import config from '../config';
 
 export default function PlayerSelectScreen({ navigation, route }) {
-  const { teamKey, teamAId, teamBId, onPlayersSelected } = route.params;
+  const { teamKey, teamA, teamB, onTeamASelected } = route.params;
+  const { userToken } = useContext(AuthContext);
 
-  const [search, setSearch] = useState('');
-  const [teamA, setTeamA] = useState(null);
-  const [teamB, setTeamB] = useState(null);
+  const team = teamKey === 'teamA' ? teamA : teamB;
   const [players, setPlayers] = useState([]);
-  const [filteredPlayers, setFilteredPlayers] = useState([]);
-  const [selectedPlayers, setSelectedPlayers] = useState({});
+  const [filtered, setFiltered] = useState([]);
+  const [search, setSearch] = useState('');
+  const [selected, setSelected] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const teams = db.teams || [];
-    const a = teams.find(t => t.id === teamAId);
-    const b = teams.find(t => t.id === teamBId);
-    setTeamA(a);
-    setTeamB(b);
-
-    // Default to teamA's players to pick from
-    if (teamKey === 'teamA' && a) {
-      setPlayers(a.players);
-      setFilteredPlayers(a.players);
-    } else if (teamKey === 'teamB' && b) {
-      setPlayers(b.players);
-      setFilteredPlayers(b.players);
-    }
-  }, [teamAId, teamBId, teamKey]);
+    fetch(`${config.BACKEND_URL}/teams/${team._id}/players`, {
+      headers: { Authorization: `Bearer ${userToken}` },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setPlayers(data);
+        setFiltered(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log('Fetch error:', err);
+        setLoading(false);
+      });
+  }, [team._id, userToken]);
 
   useEffect(() => {
-    if (search.trim() === '') {
-      setFilteredPlayers(players);
-    } else {
-      const lower = search.toLowerCase();
-      setFilteredPlayers(players.filter(p => p.name.toLowerCase().includes(lower)));
-    }
+    const lower = search.toLowerCase();
+    setFiltered(players.filter(p => p.name.toLowerCase().includes(lower)));
   }, [search, players]);
 
-  const toggleSelect = (player) => {
-    const currentCount = Object.keys(selectedPlayers).length;
-
-    if (selectedPlayers[player.id]) {
-      const newSelected = { ...selectedPlayers };
-      delete newSelected[player.id];
-      setSelectedPlayers(newSelected);
+  const toggle = (player) => {
+    const count = Object.keys(selected).length;
+    if (selected[player.id]) {
+      const copy = { ...selected };
+      delete copy[player.id];
+      setSelected(copy);
     } else {
-      if (currentCount >= 11) return;
-      setSelectedPlayers({ ...selectedPlayers, [player.id]: player });
+      if (count >= 11) return;
+      setSelected({ ...selected, [player.id]: player });
     }
   };
 
-  const renderItem = ({ item }) => {
-    const selected = !!selectedPlayers[item.id];
+  const handleNext = () => {
+    const picked = Object.values(selected);
+    if (picked.length === 0) return;
+
+    if (teamKey === 'teamA') {
+      navigation.replace('PlayerSelectScreen', {
+        teamKey: 'teamB',
+        teamA,
+        teamB,
+        onTeamASelected: picked,
+      });
+    } else {
+      navigation.navigate('MatchInfoScreen', {
+        teamAPlayers: onTeamASelected,
+        teamBPlayers: picked,
+        teamA,
+        teamB,
+      });
+    }
+  };
+
+  if (loading) {
     return (
-      <TouchableOpacity
-        onPress={() => toggleSelect(item)}
-        style={[styles.playerItem, selected && styles.playerItemSelected]}
-      >
-        <Text style={[styles.playerText, selected && styles.playerTextSelected]}>
-          {item.name} {item.role ? `(${item.role})` : ''}
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#00c853" />
+        <Text style={{ color: '#aaa', marginTop: 10 }}>Loading players...</Text>
+      </View>
     );
-  };
-
-  const handleDone = () => {
-    if (Object.keys(selectedPlayers).length === 0) return;
-    if (onPlayersSelected) {
-      onPlayersSelected(teamKey, Object.values(selectedPlayers));
-    }
-    navigation.goBack();
-  };
+  }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={80}
-      >
-        <View style={styles.container}>
-          <StatusBar barStyle="light-content" backgroundColor="#121212" />
-          <Text style={styles.title}>Select Players</Text>
+    <View style={styles.container}>
+      <Text style={styles.header}>{team.name} - Select Players</Text>
 
-          <View style={styles.teamNames}>
-            <Text style={styles.teamName}>{teamA?.name || 'Team A'}</Text>
-            <Text style={styles.vs}>|</Text>
-            <Text style={styles.teamName}>{teamB?.name || 'Team B'}</Text>
-          </View>
+      <TextInput
+        placeholder="Search players..."
+        placeholderTextColor="#aaa"
+        value={search}
+        onChangeText={setSearch}
+        style={styles.search}
+      />
 
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search players"
-            placeholderTextColor="#999"
-            value={search}
-            onChangeText={setSearch}
-          />
+      <FlatList
+        data={filtered}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => {
+          const isSelected = selected[item.id];
+          return (
+            <TouchableOpacity
+              onPress={() => toggle(item)}
+              style={[styles.item, isSelected && styles.selectedItem]}
+            >
+              <Text style={[styles.itemText, isSelected && styles.selectedText]}>
+                {item.name} {item.role ? `(${item.role})` : ''}
+              </Text>
+            </TouchableOpacity>
+          );
+        }}
+        ListEmptyComponent={<Text style={styles.empty}>No players found</Text>}
+      />
 
-          <FlatList
-            data={filteredPlayers}
-            keyExtractor={item => item.id}
-            renderItem={renderItem}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ flexGrow: 1 }}
-            ListEmptyComponent={<Text style={styles.emptyText}>No players found</Text>}
-          />
-
-          <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
-            <Text style={styles.doneText}>Done ({Object.keys(selectedPlayers).length}/11)</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+      <TouchableOpacity style={styles.button} onPress={handleNext}>
+        <Text style={styles.buttonText}>Next ({Object.keys(selected).length}/11)</Text>
+      </TouchableOpacity>
+    </View>
   );
-
 }
 
 const styles = StyleSheet.create({
@@ -126,30 +124,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
     padding: 20,
   },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  teamNames: {
-    flexDirection: 'row',
+  centered: {
+    flex: 1,
+    backgroundColor: '#121212',
     justifyContent: 'center',
-    marginBottom: 20,
+    alignItems: 'center',
   },
-  teamName: {
-    color: '#00c853',
+  header: {
+    color: '#fff',
     fontSize: 18,
-    fontWeight: '600',
-    marginHorizontal: 10,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
-  vs: {
-    color: '#888',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  searchInput: {
+  search: {
     backgroundColor: '#222',
     color: '#fff',
     borderRadius: 8,
@@ -158,36 +145,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
   },
-  playerItem: {
+  item: {
     padding: 14,
     backgroundColor: '#1e1e1e',
     borderRadius: 8,
     marginBottom: 10,
   },
-  playerItemSelected: {
+  selectedItem: {
     backgroundColor: '#00c853',
   },
-  playerText: {
+  itemText: {
     color: '#fff',
     fontSize: 16,
   },
-  playerTextSelected: {
+  selectedText: {
     color: '#121212',
     fontWeight: 'bold',
   },
-  doneButton: {
+  button: {
     backgroundColor: '#00c853',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
   },
-  doneText: {
+  buttonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  emptyText: {
+  empty: {
     color: '#666',
     textAlign: 'center',
     marginTop: 20,

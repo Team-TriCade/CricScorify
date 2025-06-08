@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  FlatList, StyleSheet, StatusBar, Image
+  FlatList, StyleSheet, StatusBar, Image, ActivityIndicator
 } from 'react-native';
 import { MatchContext } from '../context/MatchContext';
 import { AuthContext } from '../context/AuthContext';
@@ -17,6 +17,7 @@ export default function TeamSelectScreen({ route, navigation }) {
   const [filteredTeams, setFilteredTeams] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showGlobal, setShowGlobal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -38,22 +39,21 @@ export default function TeamSelectScreen({ route, navigation }) {
         setAllTeams(data);
       } catch (err) {
         console.log('Fetch teams error:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchUser();
-    fetchTeams();
-  }, [userToken]);
+    Promise.all([fetchUser(), fetchTeams()]);
+  }, []);
 
   useEffect(() => {
-    if (!userEmail) return;
-
     const filtered = allTeams
-      .filter(team =>
-        showGlobal ? team.ownerEmail !== userEmail : team.ownerEmail === userEmail
+      .filter(t =>
+        showGlobal ? t.ownerEmail !== userEmail : t.ownerEmail === userEmail
       )
-      .filter(team =>
-        team.name.toLowerCase().includes(searchQuery.toLowerCase())
+      .filter(t =>
+        t.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     setFilteredTeams(filtered);
   }, [allTeams, searchQuery, showGlobal, userEmail]);
@@ -63,6 +63,15 @@ export default function TeamSelectScreen({ route, navigation }) {
     else setTeamB(team);
     navigation.goBack();
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#00c853" />
+        <Text style={{ color: '#fff', marginTop: 10 }}>Loading Teams...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -130,8 +139,11 @@ const styles = StyleSheet.create({
     marginBottom: 15, borderWidth: 1, borderColor: '#333',
   },
   logo: {
-    width: 40, height: 40, borderRadius: 20,
-    marginRight: 15, backgroundColor: '#333',
+    width: 45,  // smaller width
+    height: 45, // smaller height
+    borderRadius: 20, // keep it round
+    marginRight: 15,
+    backgroundColor: '#333',
   },
   teamName: { color: '#fff', fontSize: 18 },
 });

@@ -12,6 +12,7 @@ import SettingsScreen from '../screens/SettingsScreen'; // ~ protected screen
 import MatchSetupScreen from '../screens/MatchSetupScreen'; // ~ protected screen
 import TeamSelectScreen from '../screens/TeamSelectScreen'; // ~ protected screen
 import PlayerSelectScreen from '../screens/PlayerSelectScreen'; // ~ protected screen
+import MatchInfoScreen from '../screens/MatchInfoScreen'; // ~ protected screen
 const Stack = createNativeStackNavigator();
 
 export default function AppNav() {
@@ -29,6 +30,7 @@ export default function AppNav() {
           <Stack.Screen name="MatchSetup" component={MatchSetupScreen} />
           <Stack.Screen name="TeamSelectScreen" component={TeamSelectScreen} />
           <Stack.Screen name="PlayerSelectScreen" component={PlayerSelectScreen} />
+          <Stack.Screen name="MatchInfo" component={MatchInfoScreen} />
         </>
       ) : (
         <>

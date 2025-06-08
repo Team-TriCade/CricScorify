@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 
 const teamSchema = new mongoose.Schema({
+  teamId: { type: String, required: true, unique: true },
   name: { type: String, required: true },
-  logo: { type: String },
+  logo: String,
   ownerEmail: { type: String, required: true },
-  players: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Player' }]
+  players: [{ type: String, ref: 'Player' }]
 });
 
 module.exports = mongoose.model('Team', teamSchema);
